@@ -1,6 +1,9 @@
 import streamlit as st
 import itertools
 
+DEFAULT_BASE_ABILITY_POWER = 100
+DEFAULT_MAX_COST = 20000
+
 # Item format: (name, ap%, cdr%, cost, required, character)
 ITEMS = [
     ("Icy Coolant", 0, 5, 5000, 0, "all"),
@@ -40,8 +43,8 @@ ITEMS = [
     ("Icy Veins", 10.01, 0, 10000, 0, "mei"),
 ]
 
-def filter_items(character):
-    return [item for item in ITEMS if item[5] == "all" or item[5] == character]
+def filter_items(character, exclude_names, only_generic):
+    return [item for item in ITEMS if item[0] not in exclude_names and (not only_generic or item[5] == "all") and (item[5] == "all" or item[5] == character)]
 
 def calculate(combo, ignore_cdr, base_ability_power, base_cooldown):
     ap_bonus = sum(item[1] for item in combo) / 100
@@ -81,39 +84,27 @@ def find_best_combo(items, max_items, max_cost, ignore_cdr, cdr_only, base_abili
 
 st.title("Ability Optimizer")
 
-base_ability_power = st.number_input("Base Ability Power", min_value=1, value=100, step=1)
+base_ability_power = st.number_input("Base Ability Power", min_value=1, value=DEFAULT_BASE_ABILITY_POWER, step=1)
 base_cooldown = st.number_input("Base Cooldown (seconds)", min_value=0.1, value=10.0, step=0.1, format="%.2f")
 
-characters = sorted(set(i[5] for i in ITEMS if i[5] != "all"))
-characters.insert(0, "All Characters (non-character-specific only)")  # Add special option
+character = st.selectbox("Select Character", sorted(set(i[5] for i in ITEMS if i[5] != "all")))
+only_generic = st.checkbox("Use Only Non-Character Specific Items", value=False)
 
-character = st.selectbox("Select Character", characters)
+blacklist_names = st.multiselect("Blacklist Items", options=[item[0] for item in ITEMS])
 
-if character == "All Characters (non-character-specific only)":
-    filtered = [item for item in ITEMS if item[5] == "all"]
-else:
-    filtered = filter_items(character)
-
+filtered = filter_items(character, blacklist_names, only_generic)
 item_names = [item[0] for item in filtered]
-
-# User selects required items from available items
 required_names = st.multiselect("Select Required Items", options=item_names)
 
-# User selects blacklisted items to exclude from optimization
-blacklist_names = st.multiselect("Blacklist Items (exclude from optimizer)", options=item_names)
-
-# Filter out blacklisted items and update required flag
 filtered = [
     (item[0], item[1], item[2], item[3], 1 if item[0] in required_names else 0, item[5])
-    for item in filtered if item[0] not in blacklist_names
-
+    for item in filtered
 ]
-
 
 ignore_cdr = st.checkbox("Ignore Cooldown Reduction", value=True)
 cdr_only = st.checkbox("Optimize Only Cooldowns")
 max_items = st.slider("Max Number of Items", 1, 6, 6)
-max_cost = st.number_input("Max Total Cost", min_value=0, max_value=150000, value=20000, step=1000)
+max_cost = st.number_input("Max Total Cost", min_value=0, max_value=150000, value=DEFAULT_MAX_COST, step=1000)
 
 best_combo, value, stats = find_best_combo(filtered, max_items, max_cost, ignore_cdr, cdr_only, base_ability_power, base_cooldown)
 
@@ -125,6 +116,7 @@ if best_combo:
     ap_bonus, cdr_bonus, final_ap, cooldown_eff, total_cost, pulsar_bonus = stats
     st.markdown("---")
     st.write(f"**Total Cost:** {total_cost} / {max_cost}")
+    st.write(f"**Remaining Money:** {max_cost - total_cost}")
     st.write(f"**Total AP Bonus:** {ap_bonus * 100:.2f}%")
     st.write(f"**Total Cooldown Reduction:** {cdr_bonus * 100:.2f}%")
 
