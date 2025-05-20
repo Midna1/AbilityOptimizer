@@ -81,12 +81,19 @@ def find_best_combo(items, max_items, max_cost, ignore_cdr, cdr_only, base_abili
 
 st.title("Ability Optimizer")
 
-base_ability_power = st.number_input("Base Ability Damage", min_value=1, value=100, step=1)
+base_ability_power = st.number_input("Base Ability Power", min_value=1, value=100, step=1)
 base_cooldown = st.number_input("Base Cooldown (seconds)", min_value=0.1, value=10.0, step=0.1, format="%.2f")
 
-character = st.selectbox("Select Character", sorted(set(i[5] for i in ITEMS if i[5] != "all")))
+characters = sorted(set(i[5] for i in ITEMS if i[5] != "all"))
+characters.insert(0, "All Characters (non-character-specific only)")  # Add special option
 
-filtered = filter_items(character)
+character = st.selectbox("Select Character", characters)
+
+if character == "All Characters (non-character-specific only)":
+    filtered = [item for item in ITEMS if item[5] == "all"]
+else:
+    filtered = filter_items(character)
+
 item_names = [item[0] for item in filtered]
 
 # User selects required items from available items
@@ -95,11 +102,12 @@ required_names = st.multiselect("Select Required Items", options=item_names)
 # User selects blacklisted items to exclude from optimization
 blacklist_names = st.multiselect("Blacklist Items (exclude from optimizer)", options=item_names)
 
-# Filter out blacklisted items completely
+# Filter out blacklisted items and update required flag
 filtered = [
     (item[0], item[1], item[2], item[3], 1 if item[0] in required_names else 0, item[5])
     for item in filtered if item[0] not in blacklist_names
 ]
+
 
 ignore_cdr = st.checkbox("Ignore Cooldown Reduction", value=True)
 cdr_only = st.checkbox("Optimize Only Cooldowns")
