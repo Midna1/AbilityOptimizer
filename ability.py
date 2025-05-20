@@ -81,7 +81,7 @@ def find_best_combo(items, max_items, max_cost, ignore_cdr, cdr_only, base_abili
 
 st.title("Ability Optimizer")
 
-base_ability_power = st.number_input("Base Ability Power", min_value=1, value=100, step=1)
+base_ability_power = st.number_input("Base Ability Damage", min_value=1, value=100, step=1)
 base_cooldown = st.number_input("Base Cooldown (seconds)", min_value=0.1, value=10.0, step=0.1, format="%.2f")
 
 character = st.selectbox("Select Character", sorted(set(i[5] for i in ITEMS if i[5] != "all")))
