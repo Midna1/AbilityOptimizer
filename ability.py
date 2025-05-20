@@ -43,8 +43,8 @@ ITEMS = [
     ("Icy Veins", 10.01, 0, 10000, 0, "mei"),
 ]
 
-def filter_items(character, exclude_names, only_generic):
-    return [item for item in ITEMS if item[0] not in exclude_names and (not only_generic or item[5] == "all") and (item[5] == "all" or item[5] == character)]
+def filter_items(character, exclude_names):
+    return [item for item in ITEMS if item[0] not in exclude_names and (character == "Generic" and item[5] == "all" or character != "Generic" and (item[5] == "all" or item[5] == character))]
 
 def calculate(combo, ignore_cdr, base_ability_power, base_cooldown):
     ap_bonus = sum(item[1] for item in combo) / 100
@@ -87,12 +87,13 @@ st.title("Ability Optimizer")
 base_ability_power = st.number_input("Base Ability Power", min_value=1, value=DEFAULT_BASE_ABILITY_POWER, step=1)
 base_cooldown = st.number_input("Base Cooldown (seconds)", min_value=0.1, value=10.0, step=0.1, format="%.2f")
 
-character = st.selectbox("Select Character", sorted(set(i[5] for i in ITEMS if i[5] != "all")))
-only_generic = st.checkbox("Use Only Non-Character Specific Items", value=False)
+characters = sorted(set(i[5] for i in ITEMS if i[5] != "all"))
+characters.insert(0, "Generic")
+character = st.selectbox("Select Character", characters)
 
 blacklist_names = st.multiselect("Blacklist Items", options=[item[0] for item in ITEMS])
 
-filtered = filter_items(character, blacklist_names, only_generic)
+filtered = filter_items(character, blacklist_names)
 item_names = [item[0] for item in filtered]
 required_names = st.multiselect("Select Required Items", options=item_names)
 
