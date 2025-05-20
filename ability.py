@@ -17,7 +17,7 @@ ITEMS = [
     ("Multitool", 10, 5, 4500, 0, "all"),
     ("Nano cola", 20, 0, 6000, 0, "all"),
     ("Threetap Tommygun", 10, 0, 9500, 0, "all"),
-    #("Biotech Maximizer", 10, 10, 10000, 0, "all"),
+    ("Biotech Maximizer", 10, 10, 10000, 0, "all"),
     ("Catalytic Crystal", 15, 0, 10000, 0, "all"),
     ("Lumerico Fusion Drive", 15, 0, 10000, 0, "all"),
     ("SuperFlexor", 25, 0, 10000, 0, "all"),
@@ -43,6 +43,7 @@ ITEMS = [
     ("Sturdy Snowfort", 15.01, 0, 10000, 0, "mei"),
     ("Icy Veins", 10.01, 0, 10000, 0, "mei"),
 ]
+
 
 
 def filter_items(character):
@@ -82,16 +83,29 @@ def find_best_combo(items, max_items, max_cost, ignore_cdr, cdr_only):
                 best = (full_combo, value, (ap, cdr, ap_final, ceff, cost, pulsar))
     return best
 
-# --- Streamlit App ---
+# --- Streamlit UI ---
+
 st.title("Ability Optimizer")
 
 character = st.selectbox("Select Character", sorted(set(i[5] for i in ITEMS if i[5] != "all")))
-ignore_cdr = st.toggle("Ignore Cooldown Reduction", value=True)
-cdr_only = st.toggle("Optimize Only Cooldowns")
+
+filtered = filter_items(character)
+item_names = [item[0] for item in filtered]
+
+# User selects required items from available items
+required_names = st.multiselect("Select Required Items", options=item_names)
+
+# Update the required flag in items based on user selection
+filtered = [
+    (item[0], item[1], item[2], item[3], 1 if item[0] in required_names else 0, item[5])
+    for item in filtered
+]
+
+ignore_cdr = st.checkbox("Ignore Cooldown Reduction", value=True)
+cdr_only = st.checkbox("Optimize Only Cooldowns")
 max_items = st.slider("Max Number of Items", 1, 6, 6)
 max_cost = st.number_input("Max Total Cost", min_value=0, max_value=150000, value=120000, step=1000)
 
-filtered = filter_items(character)
 best_combo, value, stats = find_best_combo(filtered, max_items, max_cost, ignore_cdr, cdr_only)
 
 if best_combo:
@@ -101,20 +115,20 @@ if best_combo:
 
     ap_bonus, cdr_bonus, final_ap, cooldown_eff, total_cost, pulsar_bonus = stats
     st.markdown("---")
-    st.write(f"**Total Cost**: {total_cost} / {max_cost}")
-    st.write(f"**Total AP Bonus**: {ap_bonus * 100:.2f}%")
-    st.write(f"**Total Cooldown Reduction**: {cdr_bonus * 100:.2f}%")
+    st.write(f"**Total Cost:** {total_cost} / {max_cost}")
+    st.write(f"**Total AP Bonus:** {ap_bonus * 100:.2f}%")
+    st.write(f"**Total Cooldown Reduction:** {cdr_bonus * 100:.2f}%")
 
     if not cdr_only:
-        st.write(f"**Final Ability Power**: {final_ap:.2f}")
+        st.write(f"**Final Ability Power:** {final_ap:.2f}")
         if pulsar_bonus > 0:
-            st.write(f"**Pulsar Destroyers Bonus**: +{pulsar_bonus:.2f}")
+            st.write(f"**Pulsar Destroyers Bonus:** +{pulsar_bonus:.2f}")
         if ignore_cdr:
             st.write(f"**Cooldown Reduction Ignored**")
         else:
             effective_cooldown = BASE_COOLDOWN * (1 - cdr_bonus)
-            st.write(f"**Cooldown Efficiency**: x{cooldown_eff:.2f}")
-            st.write(f"**Effective Cooldown**: {effective_cooldown:.2f}s")
+            st.write(f"**Cooldown Efficiency:** x{cooldown_eff:.2f}")
+            st.write(f"**Effective Cooldown:** {effective_cooldown:.2f}s")
         st.success(f"Max Effective Ability Output: {value:.2f}")
     else:
         effective_cooldown = BASE_COOLDOWN * (1 - cdr_bonus)
