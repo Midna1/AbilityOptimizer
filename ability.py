@@ -114,9 +114,13 @@ cdr_only = st.checkbox("Optimize Only Cooldowns")
 max_items = st.slider("Max Number of Items", 1, 6, 6)
 max_cost = st.number_input("Max Total Cost", min_value=0, max_value=150000, value=20000, step=1000)
 
-best_combo, value, stats = find_best_combo(filtered, max_items, max_cost, ignore_cdr, cdr_only, base_ability_power, base_cooldown)
+best_combo, value, stats = find_best_combo(filtered, max_items, max_cost, ignore_cdr, cdr_only)
 
 if best_combo:
+    _, _, _, _, total_cost, _ = stats
+    remaining_money = max_cost - total_cost
+    st.write(f"**Remaining Money:** {remaining_money} / {max_cost}")
+
     st.subheader("Best Combo:")
     for item in best_combo:
         st.write(f"- {item[0]} (AP: {item[1]}%, CDR: {item[2]}%, Cost: {item[3]})")
