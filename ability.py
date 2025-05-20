@@ -1,10 +1,6 @@
 import streamlit as st
 import itertools
 
-# Remove fixed constants from global scope
-# BASE_ABILITY_POWER = 85
-# BASE_COOLDOWN = 10
-
 # Item format: (name, ap%, cdr%, cost, required, character)
 ITEMS = [
     ("Icy Coolant", 0, 5, 5000, 0, "all"),
@@ -85,7 +81,7 @@ def find_best_combo(items, max_items, max_cost, ignore_cdr, cdr_only, base_abili
 
 st.title("Ability Optimizer")
 
-base_ability_power = st.number_input("Base Ability Power", min_value=1, value=85, step=1)
+base_ability_power = st.number_input("Base Ability Power", min_value=1, value=100, step=1)
 base_cooldown = st.number_input("Base Cooldown (seconds)", min_value=0.1, value=10.0, step=0.1, format="%.2f")
 
 character = st.selectbox("Select Character", sorted(set(i[5] for i in ITEMS if i[5] != "all")))
@@ -93,17 +89,22 @@ character = st.selectbox("Select Character", sorted(set(i[5] for i in ITEMS if i
 filtered = filter_items(character)
 item_names = [item[0] for item in filtered]
 
+# User selects required items from available items
 required_names = st.multiselect("Select Required Items", options=item_names)
 
+# User selects blacklisted items to exclude from optimization
+blacklist_names = st.multiselect("Blacklist Items (exclude from optimizer)", options=item_names)
+
+# Filter out blacklisted items completely
 filtered = [
     (item[0], item[1], item[2], item[3], 1 if item[0] in required_names else 0, item[5])
-    for item in filtered
+    for item in filtered if item[0] not in blacklist_names
 ]
 
 ignore_cdr = st.checkbox("Ignore Cooldown Reduction", value=True)
 cdr_only = st.checkbox("Optimize Only Cooldowns")
 max_items = st.slider("Max Number of Items", 1, 6, 6)
-max_cost = st.number_input("Max Total Cost", min_value=0, max_value=150000, value=120000, step=1000)
+max_cost = st.number_input("Max Total Cost", min_value=0, max_value=150000, value=20000, step=1000)
 
 best_combo, value, stats = find_best_combo(filtered, max_items, max_cost, ignore_cdr, cdr_only, base_ability_power, base_cooldown)
 
