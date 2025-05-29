@@ -339,6 +339,7 @@ def find_best_combo(items, max_items, max_cost, ignore_cdr, cdr_only, base_abili
 
     progress_bar.empty()
     return best
+
 # --- Streamlit UI ---
 
 st.title("Ability Optimizer")
@@ -346,18 +347,29 @@ st.title("Ability Optimizer")
 base_ability_power = st.number_input("Base Ability Power", min_value=1, value=DEFAULT_BASE_ABILITY_POWER, step=1)
 base_cooldown = st.number_input("Base Cooldown (seconds)", min_value=0.1, value=10.0, step=0.1, format="%.2f")
 
-characters = sorted(set(i[5] for i in ITEMS if i[5] != "all"))
+# Get all characters present (except 'all'), add 'Generic' option
+characters = sorted(set(item["Character"] for item in ITEMS if item["Character"] != "all"))
 characters.insert(0, "Generic")
+
 character = st.selectbox("Select Character", characters)
 
-blacklist_names = st.multiselect("Blacklist Items", options=[item[0] for item in ITEMS])
+blacklist_names = st.multiselect("Blacklist Items", options=[item["Name"] for item in ITEMS])
 
 filtered = filter_items(character, blacklist_names)
-item_names = [item[0] for item in filtered]
+item_names = [item["Name"] for item in filtered]
+
 required_names = st.multiselect("Select Required Items", options=item_names)
 
+# Update 'Required' flag in filtered items based on required_names
 filtered = [
-    (item[0], item[1], item[2], item[3], 1 if item[0] in required_names else 0, item[5])
+    {
+        "Name": item["Name"],
+        "Ability Power": item["Ability Power"],
+        "CDR": item["CDR"],
+        "Cost": item["Cost"],
+        "Required": 1 if item["Name"] in required_names else 0,
+        "Character": item["Character"]
+    }
     for item in filtered
 ]
 
@@ -371,7 +383,7 @@ best_combo, value, stats = find_best_combo(filtered, max_items, max_cost, ignore
 if best_combo:
     st.subheader("Best Combo:")
     for item in best_combo:
-        st.write(f"- {item[0]} (AP: {item[1]}%, CDR: {item[2]}%, Cost: {item[3]})")
+        st.write(f"- {item['Name']} (AP: {item['Ability Power']}%, CDR: {item['CDR']}%, Cost: {item['Cost']})")
 
     ap_bonus, cdr_bonus, final_ap, cooldown_eff, total_cost, pulsar_bonus = stats
     st.markdown("---")
