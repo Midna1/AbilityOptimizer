@@ -143,4 +143,11 @@ if best_combo:
             st.write(f"**Cooldown Reduction Ignored**")
         else:
             effective_cooldown = base_cooldown * (1 - cdr_bonus)
-            st.write(f"**Cooldown
+            st.write(f"**Cooldown Efficiency:** x{cooldown_eff:.2f}")
+            st.write(f"**Effective Cooldown:** {effective_cooldown:.2f}s")
+        st.success(f"Max Effective Ability Output: {value:.2f}")
+    else:
+        effective_cooldown = base_cooldown * (1 - cdr_bonus)
+        st.success(f"Max Cooldown Reduction: {cdr_bonus * 100:.2f}% (Cooldown: {effective_cooldown:.2f}s)")
+else:
+    st.error("No valid combination found within cost and item limits.")
