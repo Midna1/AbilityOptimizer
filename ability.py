@@ -44,7 +44,12 @@ ITEMS = [
 ]
 
 def filter_items(character, exclude_names):
-    return [item for item in ITEMS if item[0] not in exclude_names and (character == "Generic" and item[5] == "all" or character != "Generic" and (item[5] == "all" or item[5] == character))]
+    return [
+        item for item in ITEMS
+        if item[0] not in exclude_names and
+        (character == "Generic" and item[5] == "all" or
+         character != "Generic" and (item[5] == "all" or item[5] == character))
+    ]
 
 def calculate(combo, ignore_cdr, base_ability_power, base_cooldown):
     ap_bonus = sum(item[1] for item in combo) / 100
@@ -67,8 +72,15 @@ def find_best_combo(items, max_items, max_cost, ignore_cdr, cdr_only, base_abili
     optional = [i for i in items if i[4] == 0]
     best = (None, 0, ())
 
+    total_combos = sum(len(list(itertools.combinations(optional, r))) for r in range(0, max_items - len(required) + 1))
+    progress_bar = st.progress(0)
+    checked = 0
+
     for r in range(0, max_items - len(required) + 1):
         for combo in itertools.combinations(optional, r):
+            checked += 1
+            progress_bar.progress(min(checked / total_combos, 1.0))
+
             full_combo = required + list(combo)
             if len(full_combo) > max_items:
                 continue
@@ -78,6 +90,8 @@ def find_best_combo(items, max_items, max_cost, ignore_cdr, cdr_only, base_abili
             value = cdr if cdr_only else output
             if value > best[1] or (value == best[1] and cost < best[2][-2] if best[2] else True):
                 best = (full_combo, value, (ap, cdr, ap_final, ceff, cost, pulsar))
+
+    progress_bar.empty()
     return best
 
 # --- Streamlit UI ---
@@ -129,11 +143,4 @@ if best_combo:
             st.write(f"**Cooldown Reduction Ignored**")
         else:
             effective_cooldown = base_cooldown * (1 - cdr_bonus)
-            st.write(f"**Cooldown Efficiency:** x{cooldown_eff:.2f}")
-            st.write(f"**Effective Cooldown:** {effective_cooldown:.2f}s")
-        st.success(f"Max Effective Ability Output: {value:.2f}")
-    else:
-        effective_cooldown = base_cooldown * (1 - cdr_bonus)
-        st.success(f"Max Cooldown Reduction: {cdr_bonus * 100:.2f}% (Cooldown: {effective_cooldown:.2f}s)")
-else:
-    st.error("No valid combination found within cost and item limits.")
+            st.write(f"**Cooldown
