@@ -4,307 +4,56 @@ import itertools
 DEFAULT_BASE_ABILITY_POWER = 100
 DEFAULT_MAX_COST = 20000
 
-# Item format as dicts
+# Item format: (name, ap%, cdr%, cost, required, character)
 ITEMS = [
-    {
-        "Name": "Icy Coolant",
-        "Ability Power": 0,
-        "CDR": 5,
-        "Cost": 5000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Hardlight Accelerator",
-        "Ability Power": 0,
-        "CDR": 10,
-        "Cost": 11000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Power Playbook",
-        "Ability Power": 10,
-        "CDR": 0,
-        "Cost": 1000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Custom Stock",
-        "Ability Power": 10,
-        "CDR": 0,
-        "Cost": 3750,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Biolight Overflow",
-        "Ability Power": 5,
-        "CDR": 0,
-        "Cost": 3750,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Energized Bracers",
-        "Ability Power": 10,
-        "CDR": 0,
-        "Cost": 4000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Wristwraps",
-        "Ability Power": 5,
-        "CDR": 0,
-        "Cost": 4000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Multitool",
-        "Ability Power": 10,
-        "CDR": 5,
-        "Cost": 4500,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Nano cola",
-        "Ability Power": 20,
-        "CDR": 0,
-        "Cost": 6000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Threetap Tommygun",
-        "Ability Power": 10,
-        "CDR": 0,
-        "Cost": 9500,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Biotech Maximizer",
-        "Ability Power": 10,
-        "CDR": 10,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Catalytic Crystal",
-        "Ability Power": 15,
-        "CDR": 0,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Lumerico Fusion Drive",
-        "Ability Power": 15,
-        "CDR": 0,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "SuperFlexor",
-        "Ability Power": 25,
-        "CDR": 0,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Cybervenom",
-        "Ability Power": 10,
-        "CDR": 5,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Iridescent Iris",
-        "Ability Power": 20,
-        "CDR": 10,
-        "Cost": 11000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Liquid Nitrogen",
-        "Ability Power": 10,
-        "CDR": 0,
-        "Cost": 13000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Mark of the Kitsune",
-        "Ability Power": 10,
-        "CDR": 0,
-        "Cost": 11000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Champion's Kit",
-        "Ability Power": 35,
-        "CDR": 0,
-        "Cost": 14000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Ironclad Exhaust Ports",
-        "Ability Power": 0,
-        "CDR": 5,
-        "Cost": 4000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Martian Mender",
-        "Ability Power": 0,
-        "CDR": 10,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "all"
-    },
-    {
-        "Name": "Eye of the Yokai",
-        "Ability Power": 10.01,
-        "CDR": 0,
-        "Cost": 4000,
-        "Required": 0,
-        "Character": "kiriko"
-    },
-    {
-        "Name": "Donut Delivery",
-        "Ability Power": 10.01,
-        "CDR": 0,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "kiriko"
-    },
-    {
-        "Name": "Our Bikes",
-        "Ability Power": 15.01,
-        "CDR": 0,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "kiriko"
-    },
-    {
-        "Name": "Talisman of Velocity",
-        "Ability Power": 15.01,
-        "CDR": 0,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "kiriko"
-    },
-    {
-        "Name": "Talisman of Life",
-        "Ability Power": 20.01,
-        "CDR": 0,
-        "Cost": 11000,
-        "Required": 0,
-        "Character": "kiriko"
-    },
-    {
-        "Name": "Lock on shield",
-        "Ability Power": 10.01,
-        "CDR": 0,
-        "Cost": 4000,
-        "Required": 0,
-        "Character": "juno"
-    },
-    {
-        "Name": "Lux Loop",
-        "Ability Power": 10.01,
-        "CDR": 0,
-        "Cost": 4000,
-        "Required": 0,
-        "Character": "juno"
-    },
-    {
-        "Name": "Pulsar Destroyers",
-        "Ability Power": 0,
-        "CDR": 0,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "juno"
-    },
-    {
-        "Name": "Solar Shielding",
-        "Ability Power": 15.01,
-        "CDR": 0,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "juno"
-    },
-    {
-        "Name": "Red Promise Regulator",
-        "Ability Power": 15.02,
-        "CDR": 0,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "juno"
-    },
-    {
-        "Name": "Pulse Spike",
-        "Ability Power": 0,
-        "CDR": 0,
-        "Cost": 11000,
-        "Required": 0,
-        "Character": "juno"
-    },
-    {
-        "Name": "Boosted Rockets",
-        "Ability Power": 0,
-        "CDR": 0,
-        "Cost": 4000,
-        "Required": 0,
-        "Character": "juno"
-    },
-    {
-        "Name": "Sturdy Snowfort",
-        "Ability Power": 15.01,
-        "CDR": 0,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "mei"
-    },
-    {
-        "Name": "Icy Veins",
-        "Ability Power": 10.01,
-        "CDR": 0,
-        "Cost": 10000,
-        "Required": 0,
-        "Character": "mei"
-    },
+    ("Icy Coolant", 0, 5, 5000, 0, "all"),
+    ("Hardlight Accelerator", 0, 10, 11000, 0, "all"),
+    ("Power Playbook", 10, 0, 1000, 0, "all"),
+    ("Custom Stock", 10, 0, 3750, 0, "all"),
+    ("Biolight Overflow", 5, 0, 3750, 0, "all"),
+    ("Energized Bracers", 10, 0, 4000, 0, "all"),
+    ("Wristwraps", 5, 0, 4000, 0, "all"),
+    ("Multitool", 10, 5, 4500, 0, "all"),
+    ("Nano cola", 20, 0, 6000, 0, "all"),
+    ("Threetap Tommygun", 10, 0, 9500, 0, "all"),
+    ("Biotech Maximizer", 10, 10, 10000, 0, "all"),
+    ("Catalytic Crystal", 15, 0, 10000, 0, "all"),
+    ("Lumerico Fusion Drive", 15, 0, 10000, 0, "all"),
+    ("SuperFlexor", 25, 0, 10000, 0, "all"),
+    ("Cybervenom", 10, 5, 10000, 0, "all"),
+    ("Iridescent Iris", 20, 10, 11000, 0, "all"),
+    ("Liquid Nitrogen", 10, 0, 13000, 0, "all"),
+    ("Mark of the Kitsune", 10, 0, 11000, 0, "all"),
+    ("Champion's Kit", 35, 0, 14000, 0, "all"),
+    ("Ironclad Exhaust Ports", 0, 5, 4000, 0, "all"),
+    ("Martian Mender", 0, 10, 10000, 0, "all"),
+    ("Eye of the Yokai", 10.01, 0, 4000, 0, "kiriko"),
+    ("Donut Delivery", 10.01, 0, 10000, 0, "kiriko"),
+    ("Our Bikes", 15.01, 0, 10000, 0, "kiriko"),
+    ("Talisman of Velocity", 15.01, 0, 10000, 0, "kiriko"),
+    ("Talisman of Life", 20.01, 0, 11000, 0, "kiriko"),
+    ("Lock on shield", 10.01, 0, 4000, 0, "juno"),
+    ("Lux Loop", 10.01, 0, 4000, 0, "juno"),
+    ("Pulsar Destroyers", 0, 0, 10000, 0, "juno"),
+    ("Solar Shielding", 15.01, 0, 10000, 0, "juno"),
+    ("Red Promise Regulator", 15.02, 0, 10000, 0, "juno"),
+    ("Pulse Spike", 0 , 0, 11000, 0, "juno"),
+    ("Boosted Rockets", 0 , 0, 4000, 0, "juno"),
+    ("Sturdy Snowfort", 15.01, 0, 10000, 0, "mei"),
+    ("Icy Veins", 10.01, 0, 10000, 0, "mei"),
 ]
 
-
 def filter_items(character, exclude_names):
-    return [
-        item for item in ITEMS
-        if item["Name"] not in exclude_names and
-        (character == "Generic" and item["Character"] == "all" or
-         character != "Generic" and (item["Character"] == "all" or item["Character"] == character))
-    ]
+    return [item for item in ITEMS if item[0] not in exclude_names and (character == "Generic" and item[5] == "all" or character != "Generic" and (item[5] == "all" or item[5] == character))]
 
 def calculate(combo, ignore_cdr, base_ability_power, base_cooldown):
-    ap_bonus = sum(item["Ability Power"] for item in combo) / 100
-    cdr_bonus = min(sum(item["CDR"] for item in combo) / 100, 0.99)
-    cost = sum(item["Cost"] for item in combo)
+    ap_bonus = sum(item[1] for item in combo) / 100
+    cdr_bonus = min(sum(item[2] for item in combo) / 100, 0.99)
+    cost = sum(item[3] for item in combo)
     final_ap = base_ability_power * (1 + ap_bonus)
 
     pulsar_bonus = 0
-    if any(item["Name"] == "Pulsar Destroyers" for item in combo):
+    if any(item[0] == "Pulsar Destroyers" for item in combo):
         pulsar_bonus = 20 * (1 + ap_bonus)
         final_ap += pulsar_bonus
 
@@ -314,8 +63,8 @@ def calculate(combo, ignore_cdr, base_ability_power, base_cooldown):
     return output, ap_bonus, cdr_bonus, final_ap, cooldown_eff, cost, pulsar_bonus
 
 def find_best_combo(items, max_items, max_cost, ignore_cdr, cdr_only, base_ability_power, base_cooldown):
-    required = [i for i in items if i["Required"] == 1]
-    optional = [i for i in items if i["Required"] == 0]
+    required = [i for i in items if i[4] == 1]
+    optional = [i for i in items if i[4] == 0]
     best = (None, 0, ())
 
     for r in range(0, max_items - len(required) + 1):
@@ -329,7 +78,6 @@ def find_best_combo(items, max_items, max_cost, ignore_cdr, cdr_only, base_abili
             value = cdr if cdr_only else output
             if value > best[1] or (value == best[1] and cost < best[2][-2] if best[2] else True):
                 best = (full_combo, value, (ap, cdr, ap_final, ceff, cost, pulsar))
-
     return best
 
 # --- Streamlit UI ---
@@ -339,29 +87,18 @@ st.title("Ability Optimizer")
 base_ability_power = st.number_input("Base Ability Power", min_value=1, value=DEFAULT_BASE_ABILITY_POWER, step=1)
 base_cooldown = st.number_input("Base Cooldown (seconds)", min_value=0.1, value=10.0, step=0.1, format="%.2f")
 
-# Get all characters present (except 'all'), add 'Generic' option
-characters = sorted(set(item["Character"] for item in ITEMS if item["Character"] != "all"))
+characters = sorted(set(i[5] for i in ITEMS if i[5] != "all"))
 characters.insert(0, "Generic")
-
 character = st.selectbox("Select Character", characters)
 
-blacklist_names = st.multiselect("Blacklist Items", options=[item["Name"] for item in ITEMS])
+blacklist_names = st.multiselect("Blacklist Items", options=[item[0] for item in ITEMS])
 
 filtered = filter_items(character, blacklist_names)
-item_names = [item["Name"] for item in filtered]
-
+item_names = [item[0] for item in filtered]
 required_names = st.multiselect("Select Required Items", options=item_names)
 
-# Update 'Required' flag in filtered items based on required_names
 filtered = [
-    {
-        "Name": item["Name"],
-        "Ability Power": item["Ability Power"],
-        "CDR": item["CDR"],
-        "Cost": item["Cost"],
-        "Required": 1 if item["Name"] in required_names else 0,
-        "Character": item["Character"]
-    }
+    (item[0], item[1], item[2], item[3], 1 if item[0] in required_names else 0, item[5])
     for item in filtered
 ]
 
@@ -375,7 +112,7 @@ best_combo, value, stats = find_best_combo(filtered, max_items, max_cost, ignore
 if best_combo:
     st.subheader("Best Combo:")
     for item in best_combo:
-        st.write(f"- {item['Name']} (AP: {item['Ability Power']}%, CDR: {item['CDR']}%, Cost: {item['Cost']})")
+        st.write(f"- {item[0]} (AP: {item[1]}%, CDR: {item[2]}%, Cost: {item[3]})")
 
     ap_bonus, cdr_bonus, final_ap, cooldown_eff, total_cost, pulsar_bonus = stats
     st.markdown("---")
