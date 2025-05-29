@@ -339,10 +339,60 @@ def find_best_combo(items, max_items, max_cost, ignore_cdr, cdr_only, base_abili
 
     progress_bar.empty()
     return best
-
 # --- Streamlit UI ---
 
 st.title("Ability Optimizer")
 
 base_ability_power = st.number_input("Base Ability Power", min_value=1, value=DEFAULT_BASE_ABILITY_POWER, step=1)
-base_cooldown = st.number_input("Base Cooldown (seconds)", min_value=0.1, value=10.0, step=0.1,
+base_cooldown = st.number_input("Base Cooldown (seconds)", min_value=0.1, value=10.0, step=0.1, format="%.2f")
+
+characters = sorted(set(i[5] for i in ITEMS if i[5] != "all"))
+characters.insert(0, "Generic")
+character = st.selectbox("Select Character", characters)
+
+blacklist_names = st.multiselect("Blacklist Items", options=[item[0] for item in ITEMS])
+
+filtered = filter_items(character, blacklist_names)
+item_names = [item[0] for item in filtered]
+required_names = st.multiselect("Select Required Items", options=item_names)
+
+filtered = [
+    (item[0], item[1], item[2], item[3], 1 if item[0] in required_names else 0, item[5])
+    for item in filtered
+]
+
+ignore_cdr = st.checkbox("Ignore Cooldown Reduction", value=True)
+cdr_only = st.checkbox("Optimize Only Cooldowns")
+max_items = st.slider("Max Number of Items", 1, 6, 6)
+max_cost = st.number_input("Max Total Cost", min_value=0, max_value=150000, value=DEFAULT_MAX_COST, step=1000)
+
+best_combo, value, stats = find_best_combo(filtered, max_items, max_cost, ignore_cdr, cdr_only, base_ability_power, base_cooldown)
+
+if best_combo:
+    st.subheader("Best Combo:")
+    for item in best_combo:
+        st.write(f"- {item[0]} (AP: {item[1]}%, CDR: {item[2]}%, Cost: {item[3]})")
+
+    ap_bonus, cdr_bonus, final_ap, cooldown_eff, total_cost, pulsar_bonus = stats
+    st.markdown("---")
+    st.write(f"**Total Cost:** {total_cost} / {max_cost}")
+    st.write(f"**Remaining Money:** {max_cost - total_cost}")
+    st.write(f"**Total AP Bonus:** {ap_bonus * 100:.2f}%")
+    st.write(f"**Total Cooldown Reduction:** {cdr_bonus * 100:.2f}%")
+
+    if not cdr_only:
+        st.write(f"**Final Ability Power:** {final_ap:.2f}")
+        if pulsar_bonus > 0:
+            st.write(f"**Pulsar Destroyers Bonus:** +{pulsar_bonus:.2f}")
+        if ignore_cdr:
+            st.write(f"**Cooldown Reduction Ignored**")
+        else:
+            effective_cooldown = base_cooldown * (1 - cdr_bonus)
+            st.write(f"**Cooldown Efficiency:** x{cooldown_eff:.2f}")
+            st.write(f"**Effective Cooldown:** {effective_cooldown:.2f}s")
+        st.success(f"Max Effective Ability Output: {value:.2f}")
+    else:
+        effective_cooldown = base_cooldown * (1 - cdr_bonus)
+        st.success(f"Max Cooldown Reduction: {cdr_bonus * 100:.2f}% (Cooldown: {effective_cooldown:.2f}s)")
+else:
+    st.error("No valid combination found within cost and item limits.")
