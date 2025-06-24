@@ -27,18 +27,23 @@ ITEMS = [
     ("Champion's Kit", 35, 0, 14000, 0, "all"),
     ("Ironclad Exhaust Ports", 0, 5, 4000, 0, "all"),
     ("Martian Mender", 0, 10, 10000, 0, "all"),
+    ("Sonic Recharge", 10, 0, 9500, 0, "all"),
+    ("Vitality Amplifier", 10, 0, 4500, 0, "all"),
+    
     ("Eye of the Yokai", 10.01, 0, 4000, 0, "kiriko"),
-    ("Donut Delivery", 10.01, 0, 10000, 0, "kiriko"),
+    ("Donut Delivery", 0, 10, 10000, 0, "kiriko"),
     ("Our Bikes", 15.01, 0, 10000, 0, "kiriko"),
     ("Talisman of Velocity", 15.01, 0, 10000, 0, "kiriko"),
     ("Talisman of Life", 20.01, 0, 11000, 0, "kiriko"),
-    ("Lock on shield", 10.01, 0, 4000, 0, "juno"),
+    
+    ("Lock on shield", 0, 0, 4000, 0, "juno"),
     ("Lux Loop", 10.01, 0, 4000, 0, "juno"),
     ("Pulsar Destroyers", 0, 0, 10000, 0, "juno"),
     ("Solar Shielding", 15.01, 0, 10000, 0, "juno"),
     ("Red Promise Regulator", 15.02, 0, 10000, 0, "juno"),
     ("Pulse Spike", 0 , 0, 11000, 0, "juno"),
-    ("Boosted Rockets", 0 , 0, 4000, 0, "juno"),
+    ("Boosted Rockets", 0 , 0, 12000, 0, "juno"),
+    
     ("Sturdy Snowfort", 15.01, 0, 10000, 0, "mei"),
     ("Icy Veins", 10.01, 0, 10000, 0, "mei"),
 ]
